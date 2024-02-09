@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: elisa-normal
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       id-token: write
@@ -27,29 +27,15 @@ jobs:
     - name: Run test
       run: mage go:unitTest
 
-    - name: Upload test coverage to codecov
-      uses: elisa-actions/codecov-action@v4-elisa
-      with:
-        url: https://codecov.csf.elisa.fi
-
     - name: Build packages
       run: mage go:crossBuild
-
-    - name: Notify failure
-      if: |
-        github.event.pull_request.draft == false &&
-        failure()
-      env:
-        MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
-        MATTERMOST_TEXT: "${{ github.repository }} PR build. Please check [here](${{ github.event.pull_request.html_url }}/checks)."
-      run: send-to-mattermost
 
   automerge:
     needs: [build]
     permissions:
       pull-requests: write
       contents: write
-    runs-on: elisa-normal
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Automerge dependabot PR

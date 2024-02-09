@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-master:
-    runs-on: elisa-normal
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       id-token: write
@@ -25,13 +25,8 @@ jobs:
     - name: Run test
       run: mage go:unitTest
 
-    - name: Upload test coverage to codecov
-      uses: elisa-actions/codecov-action@v4-elisa
-      with:
-        url: https://codecov.csf.elisa.fi
-
   build-packages:
-    runs-on: elisa-normal
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: test-master
     steps:
@@ -43,10 +38,3 @@ jobs:
 
     - name: Build packages
       run: mage go:crossBuild
-
-    - name: Notify failure
-      if: failure()
-      env:
-        MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
-        MATTERMOST_TEXT: "${{ github.repository }} release [${{ github.event.release.tag_name }}](${{ github.event.release.html_url }}) build failed."
-      run: send-to-mattermost
